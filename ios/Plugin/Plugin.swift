@@ -24,7 +24,8 @@ public class NativeAudio: CAPPlugin {
         self.fadeMusic = false
 
         do {
-            try self.session.setCategory(AVAudioSession.Category.playback)
+            try self.session.setCategory(AVAudioSession.Category.playback,
+                                   options: [.mixWithOthers])
             try self.session.setActive(false)
         } catch {
             print("Failed to set session category")
@@ -32,17 +33,19 @@ public class NativeAudio: CAPPlugin {
     }
 
     @objc func configure(_ call: CAPPluginCall) {
-        self.fadeMusic = call.getBool(Constant.FadeKey, false)
-        do {
-            if call.getBool(Constant.FocusAudio, false) {
-                try self.session.setCategory(AVAudioSession.Category.playback)
-            } else {
-                try self.session.setCategory(AVAudioSession.Category.ambient)
-            }
-        } catch {
-            print("Failed to set setCategory audio")
-        }
-        call.resolve()
+      self.fadeMusic = call.getBool(Constant.FadeKey, false)
+      do {
+          if call.getBool(Constant.FocusAudio, false) {
+              try self.session.setCategory(AVAudioSession.Category.playback,
+                                        options: [.mixWithOthers])
+          } else {
+              try self.session.setCategory(AVAudioSession.Category.ambient,
+                                        options: [.mixWithOthers])
+          }
+      } catch {
+          print("Failed to set setCategory audio")
+      }
+      call.resolve()
     }
 
     @objc func preload(_ call: CAPPluginCall) {
